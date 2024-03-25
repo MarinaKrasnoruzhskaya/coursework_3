@@ -22,15 +22,24 @@ def exclude_null_elements(operations: list):
     return oper_new
 
 
-def sorts_by_date(operations: list):
-    """сортирует список по дате в порядке убывания"""
-    operations.sort(key=lambda x: datetime.strptime(x['date'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True)
+def converts_str_to_date(operations):
+    """заменяет значения по ключу 'date', преобразуя строку в <class 'datetime.datetime'> """
+    for oper in operations:
+        oper['date'] = datetime.strptime(oper['date'], '%Y-%m-%dT%H:%M:%S.%f')
     return operations
 
 
-def formats_the_transfer_date(date_transfer: str):
+def sorts_by_date(operations: list):
+    """сортирует список по дате в порядке убывания"""
+    def sort_key(o):
+        return o['date']
+    operations.sort(key=sort_key, reverse=True)
+    return operations
+
+
+def formats_the_transfer_date(date_transfer):
     """переводит дату в формат ДД.ММ.ГГГГ"""
-    return datetime.strptime(date_transfer, '%Y-%m-%dT%H:%M:%S.%f').strftime('%d.%m.%Y')
+    return date_transfer.strftime('%d.%m.%Y')
 
 
 def performs_account_masking(n: str):
