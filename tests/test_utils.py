@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 
 
@@ -7,9 +9,9 @@ from coursework_3 import utils
 @pytest.fixture
 def examp():
     return [
-        {'id': 509645757, 'state': 'EXECUTED', 'date': '2019-10-30T01:49:52.939296'},
-        {'id': 863064926, 'state': 'EXECUTED', 'date': '2019-12-08T22:46:21.935582'},
-        {'id': 560813069, 'state': 'CANCELED', 'date': '2019-12-03T04:27:03.427014'},
+        {'state': 'EXECUTED', 'date': datetime(2019, 10, 30, 1, 49, 52, 939296)},
+        {'state': 'EXECUTED', 'date': datetime(2019, 12, 8, 22, 46, 21, 935582)},
+        {'state': 'CANCELED', 'date': datetime(2019, 12, 3, 4, 27, 3, 427014)},
     ]
 
 
@@ -18,7 +20,7 @@ def examp_2():
     return {
         'id': 441945886,
         'state': 'EXECUTED',
-        'date': '2019-08-26T10:50:58.294041',
+        'date': datetime(2019, 8, 26, 10, 50, 58, 294041),
         'operationAmount': {'amount': '31957.58', 'currency': {'name': 'руб.', 'code': 'RUB'}},
         'description': 'Перевод организации',
         'from': 'Maestro 1596837868705199',
@@ -27,7 +29,6 @@ def examp_2():
 
 
 def test_load_json():
-
     assert utils.load_json_file("example.json") == [{"one": "two", "key": "value"}]
 
 
@@ -36,20 +37,32 @@ def test_exclude_null_elements():
     assert utils.exclude_null_elements([{}, {}]) == []
 
 
+def test_converts_str_to_date():
+    assert utils.converts_str_to_date(
+        [
+            {'date': '2019-08-26T10:50:58.294041'},
+            {'date': '2019-07-03T18:35:29.512364'}
+        ]
+    ) == [
+        {'date': datetime(2019, 8, 26, 10, 50, 58, 294041)},
+        {'date': datetime(2019, 7, 3, 18, 35, 29, 512364)}
+    ]
+
+
 def test_sorts_by_date(examp):
     assert utils.sorts_by_date(examp) == [
-        {'id': 863064926, 'state': 'EXECUTED', 'date': '2019-12-08T22:46:21.935582'},
-        {'id': 560813069, 'state': 'CANCELED', 'date': '2019-12-03T04:27:03.427014'},
-        {'id': 509645757, 'state': 'EXECUTED', 'date': '2019-10-30T01:49:52.939296'}
+        {'state': 'EXECUTED', 'date': datetime(2019, 12, 8, 22, 46, 21, 935582)},
+        {'state': 'CANCELED', 'date': datetime(2019, 12, 3, 4, 27, 3, 427014)},
+        {'state': 'EXECUTED', 'date': datetime(2019, 10, 30, 1, 49, 52, 939296)}
     ]
 
 
 def test_formats_the_transfer_date():
-    assert utils.formats_the_transfer_date('2019-12-08T22:46:21.935582') == '08.12.2019'
+    assert utils.formats_the_transfer_date(datetime(2019, 12, 8, 22, 46, 21, 935582)) == '08.12.2019'
 
 
 def test_formats_the_transfer_data_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(AttributeError):
         utils.formats_the_transfer_date('')
 
 
