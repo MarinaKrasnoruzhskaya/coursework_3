@@ -2,13 +2,14 @@ import os
 import json
 
 from datetime import datetime
+from config import ROOT_DIR
 
 
 def load_json_file(name):
     """
     читает json-данные из файла
     """
-    path_file = os.path.join(os.path.abspath("../data"), name)
+    path_file = os.path.join(ROOT_DIR, "data", name)
     with open(path_file, encoding="utf-8") as json_file:
         return json.load(json_file)
 
